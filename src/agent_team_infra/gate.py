@@ -1,7 +1,7 @@
 """Shared helpers for cron-gate scripts -- the cheap, zero-token-cost
-pre-filters (`riker_job_gate.py`, Willow's `engagement-gate.py`, Joe's
-`project-gate.py`, and whatever the next agent needs) that decide whether
-to wake an agent's LLM at all, before it's ever invoked.
+pre-filters (`source_repo_gate.py`, `own_repo_gate_cli.py`, and whatever
+custom gate an agent needs) that decide whether to wake an agent's LLM
+at all, before it's ever invoked.
 
 Every gate needs the same two small things: append-only audit logging
 with rotation, and a pending-jobs directory it can list oldest-first and

@@ -15,28 +15,28 @@ def _sign(secret: str, payload: bytes) -> str:
 
 def test_build_job_extracts_fields_with_no_api_call():
     payload = {
-        "repository": {"full_name": "sevasek/sevasek-business"},
+        "repository": {"full_name": "acme/source-repo"},
         "before": "aaa",
         "after": "bbb",
-        "pusher": {"name": "sevasek"},
+        "pusher": {"name": "someone"},
         "commits": [
             {
                 "message": "update pricing",
-                "author": {"name": "Paul Seville", "email": "sevasek@gmail.com"},
+                "author": {"name": "Jane Doe", "email": "someone@example.com"},
                 "added": ["docs/new.md"],
                 "removed": [],
-                "modified": ["docs/services/sevasek-services.md"],
+                "modified": ["docs/services/pricing.md"],
             }
         ],
     }
     job = webhook_receiver.build_job(payload)
-    assert job["repo"] == "sevasek/sevasek-business"
+    assert job["repo"] == "acme/source-repo"
     assert job["before"] == "aaa"
     assert job["after"] == "bbb"
-    assert job["pusher"] == "sevasek"
+    assert job["pusher"] == "someone"
     assert len(job["commits"]) == 1
-    assert job["commits"][0]["author"]["email"] == "sevasek@gmail.com"
-    assert job["commits"][0]["modified"] == ["docs/services/sevasek-services.md"]
+    assert job["commits"][0]["author"]["email"] == "someone@example.com"
+    assert job["commits"][0]["modified"] == ["docs/services/pricing.md"]
     assert "diff" not in job  # the whole point of the 2026-09-05 redesign
 
 
@@ -62,11 +62,11 @@ def test_webhook_queues_job_on_valid_push(monkeypatch, tmp_path):
 
     body = json.dumps(
         {
-            "repository": {"full_name": "sevasek/sevasek-business"},
+            "repository": {"full_name": "acme/source-repo"},
             "before": "aaa",
             "after": "bbb",
-            "pusher": {"name": "sevasek"},
-            "commits": [{"message": "m", "author": {"email": "sevasek@gmail.com"}, "added": [], "removed": [], "modified": []}],
+            "pusher": {"name": "someone"},
+            "commits": [{"message": "m", "author": {"email": "someone@example.com"}, "added": [], "removed": [], "modified": []}],
         }
     ).encode()
     response = client.post(
@@ -77,7 +77,7 @@ def test_webhook_queues_job_on_valid_push(monkeypatch, tmp_path):
     assert response.status_code == 200
     assert response.json()["status"] == "queued"
 
-    job_files = list((tmp_path / "sevasek-sevasek-business").glob("*.json"))
+    job_files = list((tmp_path / "acme-source-repo").glob("*.json"))
     assert len(job_files) == 1
 
 
@@ -85,15 +85,15 @@ def test_webhook_routes_by_repo_job_dir_map(monkeypatch, tmp_path):
     secret = "supersecret"
     monkeypatch.setattr(webhook_receiver, "WEBHOOK_SECRET", secret)
     monkeypatch.setattr(webhook_receiver, "JOBS_ROOT", tmp_path)
-    monkeypatch.setattr(webhook_receiver, "_REPO_JOB_DIR_MAP", {"sevasek/paulsevasekcom": "willow-jobs"})
+    monkeypatch.setattr(webhook_receiver, "_REPO_JOB_DIR_MAP", {"acme/agent-repo": "agent-b-jobs"})
     client = TestClient(webhook_receiver.app)
 
     body = json.dumps(
         {
-            "repository": {"full_name": "sevasek/paulsevasekcom"},
+            "repository": {"full_name": "acme/agent-repo"},
             "before": "aaa",
             "after": "bbb",
-            "pusher": {"name": "riker"},
+            "pusher": {"name": "agent-a"},
             "commits": [],
         }
     ).encode()
@@ -103,7 +103,7 @@ def test_webhook_routes_by_repo_job_dir_map(monkeypatch, tmp_path):
         headers={"X-Hub-Signature-256": _sign(secret, body), "X-GitHub-Event": "push"},
     )
 
-    assert list((tmp_path / "willow-jobs").glob("*.json"))
+    assert list((tmp_path / "agent-b-jobs").glob("*.json"))
 
 
 def test_webhook_ignores_non_push_events(monkeypatch, tmp_path):

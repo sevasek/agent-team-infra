@@ -1,6 +1,7 @@
 """Generic cron-gate entry point for "did my own repo just get updated"
-jobs -- usable by any single-repo agent (Willow, Joe, Danielle, whoever's
-next), not just Riker's source-repo case.
+jobs -- usable by any single-repo agent, and distinct from the
+source-repo case (`source_repo_gate.py`) an agent that provisions
+knowledge into other agents' repos would use for that separate role.
 
 Reads the next pending job (written by `webhook_receiver.py` into this
 agent's own job queue), decides wake vs refresh via `own_repo_gate`, and

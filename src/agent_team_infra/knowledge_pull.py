@@ -52,12 +52,12 @@ def knowledge_pull(
     human-readable status line, same shape as the old shell scripts
     printed, so callers/logs read the same as before.
 
-    auto_commit_pending: Riker sometimes writes into his own knowledge
-    dir directly (e.g. an org-map edit mid-session) -- set True to
-    auto-commit and push any such pending changes before pulling, so a
-    stray uncommitted edit can't be silently discarded by the reset that
-    follows. The generic per-client agent has no such write path, so it
-    defaults off.
+    auto_commit_pending: some agents (typically a knowledge-provisioner
+    role) write into their own knowledge dir directly mid-session (e.g.
+    an org-map edit) -- set True to auto-commit and push any such
+    pending changes before pulling, so a stray uncommitted edit can't be
+    silently discarded by the reset that follows. Most agents have no
+    such write path, so this defaults off.
     """
     knowledge_dir = knowledge_dir or (hermes_home / "knowledge")
     notified_file = hermes_home / ".soul-notified-hash"

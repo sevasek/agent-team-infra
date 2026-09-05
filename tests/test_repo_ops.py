@@ -126,8 +126,8 @@ def test_knowledge_commit_pushes_directly(tmp_path):
     knowledge_dir = tmp_path / "knowledge"
     subprocess.run(["git", "clone", "-q", str(origin), str(knowledge_dir)], check=True, capture_output=True)
     _git(["checkout", "-q", "main"], cwd=knowledge_dir)
-    _git(["config", "user.email", "riker@hermes.local"], cwd=knowledge_dir)
-    _git(["config", "user.name", "William Riker"], cwd=knowledge_dir)
+    _git(["config", "user.email", "agent-a@hermes.local"], cwd=knowledge_dir)
+    _git(["config", "user.name", "Agent A"], cwd=knowledge_dir)
 
     (knowledge_dir / "org.md").write_text("v2\n")
     ok, message = repo_ops.knowledge_commit(knowledge_dir, "org: update")

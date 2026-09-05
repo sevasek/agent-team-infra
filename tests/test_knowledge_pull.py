@@ -97,9 +97,9 @@ def test_apply_soul_at_boot_does_apply_it(synced_repo):
 
 
 def test_auto_commit_pending_changes_before_pull(tmp_path):
-    """Riker sometimes edits his own knowledge dir directly mid-session --
-    those must be committed and pushed, not silently discarded by the
-    reset --hard that follows."""
+    """A knowledge-provisioner agent sometimes edits its own knowledge dir
+    directly mid-session -- those must be committed and pushed, not
+    silently discarded by the reset --hard that follows."""
     hermes_home = tmp_path / "hermes_home"
     hermes_home.mkdir()
     knowledge_dir = hermes_home / "knowledge"
@@ -119,8 +119,8 @@ def test_auto_commit_pending_changes_before_pull(tmp_path):
 
     subprocess.run(["git", "clone", "-q", str(origin), str(knowledge_dir)], check=True, capture_output=True)
     _git(["checkout", "-q", "main"], cwd=knowledge_dir)
-    _git(["config", "user.email", "riker@hermes.local"], cwd=knowledge_dir)
-    _git(["config", "user.name", "William Riker"], cwd=knowledge_dir)
+    _git(["config", "user.email", "agent-a@hermes.local"], cwd=knowledge_dir)
+    _git(["config", "user.name", "Agent A"], cwd=knowledge_dir)
 
     # Simulate an uncommitted edit made directly in the knowledge dir.
     (knowledge_dir / "org.md").write_text("v2 — edited mid-session\n")

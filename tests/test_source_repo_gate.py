@@ -4,15 +4,15 @@ import json
 import sys
 from io import StringIO
 
-from agent_team_infra import riker_job_gate
+from agent_team_infra import source_repo_gate
 
 
 def _run_main(monkeypatch, jobs_dir, hermes_home):
-    monkeypatch.setattr(riker_job_gate, "JOBS_DIR", jobs_dir)
-    monkeypatch.setattr(riker_job_gate, "HERMES_HOME", hermes_home)
+    monkeypatch.setattr(source_repo_gate, "JOBS_DIR", jobs_dir)
+    monkeypatch.setattr(source_repo_gate, "HERMES_HOME", hermes_home)
     captured = StringIO()
     monkeypatch.setattr(sys, "stdout", captured)
-    riker_job_gate.main()
+    source_repo_gate.main()
     return captured.getvalue()
 
 
@@ -32,19 +32,19 @@ def test_pending_job_wakes_and_no_longer_carries_diff(monkeypatch, tmp_path):
     jobs_dir = tmp_path / "jobs"
     jobs_dir.mkdir()
     job = {
-        "id": "sevasek-sevasek-business-abc123-1",
-        "repo": "sevasek/sevasek-business",
+        "id": "acme-source-repo-abc123-1",
+        "repo": "acme/source-repo",
         "before": "aaa",
         "after": "bbb",
-        "pusher": "sevasek",
-        "commits": [{"message": "update pricing", "author": {"email": "sevasek@gmail.com"}}],
+        "pusher": "someone",
+        "commits": [{"message": "update pricing", "author": {"email": "someone@example.com"}}],
         "received_at": "2026-09-05T00:00:00Z",
     }
     (jobs_dir / "job1.json").write_text(json.dumps(job))
 
     output = _run_main(monkeypatch, jobs_dir, tmp_path)
 
-    assert "sevasek/sevasek-business" in output
+    assert "acme/source-repo" in output
     assert "update pricing" in output
     assert "Fetch the diff yourself" in output
     assert json.loads(output.strip().splitlines()[-1]) == {"wakeAgent": True}

@@ -58,9 +58,9 @@ def _write_job(jobs_dir: Path, **overrides):
     jobs_dir.mkdir(parents=True, exist_ok=True)
     job = {
         "id": "job1",
-        "repo": "sevasek/performance-agent",
-        "pusher": "riker",
-        "commits": [{"message": "task update", "author": {"email": "riker@hermes.local"}, "modified": ["project-tasks.md"]}],
+        "repo": "acme/agent-repo",
+        "pusher": "agent-a",
+        "commits": [{"message": "task update", "author": {"email": "agent-a@hermes.local"}, "modified": ["project-tasks.md"]}],
         "received_at": "2026-09-05T00:00:00Z",
     }
     job.update(overrides)
@@ -88,7 +88,7 @@ def test_knowledge_file_commit_only_refreshes(monkeypatch, tmp_path):
     jobs_dir = tmp_path / "jobs"
     _write_job(
         jobs_dir,
-        commits=[{"message": "fact update", "author": {"email": "riker@hermes.local"}, "modified": ["company/company.md"]}],
+        commits=[{"message": "fact update", "author": {"email": "agent-a@hermes.local"}, "modified": ["company/company.md"]}],
     )
 
     output = _run_main(monkeypatch, hermes_home, jobs_dir)
@@ -102,10 +102,10 @@ def test_self_authored_task_edit_downgrades_to_refresh(monkeypatch, tmp_path):
     jobs_dir = tmp_path / "jobs"
     _write_job(
         jobs_dir,
-        commits=[{"message": "status flip", "author": {"email": "danielle@hermes.local"}, "modified": ["project-tasks.md"]}],
+        commits=[{"message": "status flip", "author": {"email": "agent-c@hermes.local"}, "modified": ["project-tasks.md"]}],
     )
 
-    output = _run_main(monkeypatch, hermes_home, jobs_dir, identity_email="danielle@hermes.local")
+    output = _run_main(monkeypatch, hermes_home, jobs_dir, identity_email="agent-c@hermes.local")
     assert json.loads(output.strip().splitlines()[-1]) == {"wakeAgent": False}, (
         "a task-file edit authored entirely by the agent itself should be a "
         "redundant wake, not a real one -- it's already active, it just made this edit"
@@ -115,9 +115,9 @@ def test_self_authored_task_edit_downgrades_to_refresh(monkeypatch, tmp_path):
 def test_task_edit_by_someone_else_still_wakes_even_with_identity_set(monkeypatch, tmp_path):
     hermes_home = _setup_hermes_home(tmp_path)
     jobs_dir = tmp_path / "jobs"
-    _write_job(jobs_dir)  # authored by riker@hermes.local
+    _write_job(jobs_dir)  # authored by agent-a@hermes.local
 
-    output = _run_main(monkeypatch, hermes_home, jobs_dir, identity_email="danielle@hermes.local")
+    output = _run_main(monkeypatch, hermes_home, jobs_dir, identity_email="agent-c@hermes.local")
     assert json.loads(output.strip().splitlines()[-1]) == {"wakeAgent": True}
 
 

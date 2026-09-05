@@ -1,12 +1,13 @@
 """Decide whether a push into an agent's OWN repo warrants a full wake
 (invoke the LLM) or just the routine `knowledge_pull` refresh.
 
-This is deliberately not the source-repo gate (`riker_job_gate.py`'s
-job) -- when Riker watches `sevasek-business`, the content is raw and
-unvetted, and deciding what it means is real agentic work. But when
-Riker commits into an agent's OWN repo, that content already went
-through the full approval flow before it was committed -- there's
-nothing left to interpret, just knowledge to reload. The one exception
+This is deliberately not the source-repo gate (`source_repo_gate.py`'s
+job) -- when an agent watches an external source repo it doesn't own,
+the content is raw and unvetted, and deciding what it means is real
+agentic work. But when a knowledge-provisioner agent commits into
+another agent's OWN repo, that content already went through the full
+approval flow before it was committed -- there's nothing left to
+interpret, just knowledge to reload. The one exception
 is a *task* file: a new or updated task needs someone to act on it or
 schedule acting on it, which a silent refresh doesn't accomplish. So the
 decision is made by which file changed, not by who pushed it:
