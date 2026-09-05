@@ -21,6 +21,7 @@ apply-soul-at-boot = "agent_team_infra.cli:cmd_apply_soul_at_boot"
 repo-pull = "agent_team_infra.cli:cmd_repo_pull"
 repo-push = "agent_team_infra.cli:cmd_repo_push"
 knowledge-commit = "agent_team_infra.cli:cmd_knowledge_commit"
+own-repo-gate = "agent_team_infra.own_repo_gate_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
