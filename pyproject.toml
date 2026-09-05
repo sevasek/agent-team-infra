@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-team-infra"
+version = "0.1.0"
+description = "Shared infra for the sevasek Hermes agent fleet: knowledge-pull, cron-gate helpers, and the webhook receiver"
+requires-python = ">=3.11"
+dependencies = [
+    "requests",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "fastapi", "httpx"]
+webhook = ["fastapi", "uvicorn"]
+
+[project.scripts]
+knowledge-pull = "agent_team_infra.cli:cmd_knowledge_pull"
+apply-soul-at-boot = "agent_team_infra.cli:cmd_apply_soul_at_boot"
+repo-pull = "agent_team_infra.cli:cmd_repo_pull"
+repo-push = "agent_team_infra.cli:cmd_repo_push"
+knowledge-commit = "agent_team_infra.cli:cmd_knowledge_commit"
+
+[tool.setuptools.packages.find]
+where = ["src"]
